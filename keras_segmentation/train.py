@@ -3,7 +3,7 @@ from .data_utils.data_loader import image_segmentation_generator, \
     verify_segmentation_dataset
 import glob
 import six
-import tensorflow as tf
+import tensorflow
 from keras.callbacks import Callback
 
 
@@ -103,7 +103,7 @@ def train(model,
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=[tf.keras.metrics.MeanIoU(num_classes=n_classes)])
+                      metrics=[tensorflow.keras.metrics.MeanIoU(num_classes=n_classes)])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
