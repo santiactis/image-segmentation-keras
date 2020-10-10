@@ -180,11 +180,50 @@ def _load_augmentation_aug_all():
     )
 
 
+def _load_augmentation_aug_all_seismic():
+    """ Load image augmentation model """
+
+    def sometimes(aug):
+        return iaa.Sometimes(0.5, aug)
+
+    return iaa.Sequential(
+        [
+            # apply the following augmenters to most images
+            iaa.Fliplr(0.5),  # horizontally flip 50% of all images
+            # crop images by -5% to 10% of their height/width
+            sometimes(iaa.CropAndPad(
+                percent=(-0.05, 0.1),
+                pad_mode='constant',
+                pad_cval=(0, 255)
+            )),
+            sometimes(iaa.Affine(
+                # scale images to 80-120% of their size, individually per axis
+                scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+                # translate by -20 to +20 percent (per axis)
+                translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+                rotate=(-45, 45),  # rotate by -45 to +45 degrees
+                shear=(-16, 16),  # shear by -16 to +16 degrees
+                # use nearest neighbour or bilinear interpolation (fast)
+                order=[0, 1],
+                # if mode is constant, use a cval between 0 and 255
+                cval=(0, 255),
+                # use any of scikit-image's warping modes
+                # (see 2nd image from the top for examples)
+                mode='constant'
+            )),
+            iaa.OneOf([
+                iaa.GaussianBlur((0, 3.0)),
+                iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.5)],
+                random_order=True])
+        ]
+        , random_order=True)
+
 augmentation_functions = {
     "aug_all": _load_augmentation_aug_all,
     "aug_all2": _load_augmentation_aug_all2,
     "aug_geometric": _load_augmentation_aug_geometric,
-    "aug_non_geometric": _load_augmentation_aug_non_geometric
+    "aug_non_geometric": _load_augmentation_aug_non_geometric,
+    "aug_seismic": _load_augmentation_aug_all_seismi
 }
 
 
