@@ -214,7 +214,7 @@ augmentation_functions = {
     "aug_all2": _load_augmentation_aug_all2,
     "aug_geometric": _load_augmentation_aug_geometric,
     "aug_non_geometric": _load_augmentation_aug_non_geometric,
-    "aug_seismic": _load_augmentation_aug_all_seismi
+    "aug_seismic": _load_augmentation_aug_all_seismic
 }
 
 
