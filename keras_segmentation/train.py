@@ -99,11 +99,11 @@ def train(model,
         if ignore_zero_class:
             loss_k = masked_categorical_crossentropy
         else:
-            loss_k = 'categorical_crossentropy'
+            loss_k = 'sparse_categorical_crossentropy'
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=[tensorflow.keras.metrics.MeanIoU(num_classes=n_classes)])
+                      metrics=['accuracy',tensorflow.keras.metrics.MeanIoU(num_classes=n_classes)])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
