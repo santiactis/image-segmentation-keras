@@ -171,7 +171,7 @@ def train(model,
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=['accuracy',tensorflow.keras.metrics.MeanIoU(num_classes=n_classes)])
+                      metrics=['accuracy'])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
