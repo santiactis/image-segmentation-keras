@@ -119,7 +119,6 @@ def train(model,
           n_classes=None,
           verify_dataset=True,
           checkpoints_path=None,
-          loss_k='categorical_crossentropy',
           epochs=5,
           batch_size=2,
           validate=False,
@@ -163,11 +162,8 @@ def train(model,
         if ignore_zero_class:
             loss_k = masked_categorical_crossentropy
             
-        elif loss_k == 'dice':
-            loss_k = generalised_dice_loss(train_images, train_annotations)   
-        
         else:
-            loss_k = 'categorical_crossentropy'
+            loss_k = generalised_dice_loss(train_images, train_annotations)
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
