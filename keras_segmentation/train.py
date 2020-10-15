@@ -23,10 +23,10 @@ def dice_loss(gt, pr, smooth=1e-6):
     keras tensor
         tensor containing dice loss.
     """
-    y_true_f = K.flatten(gt)
-    y_pred_f = K.flatten(pr)
-    intersection = K.sum(y_true_f * y_pred_f)
-    answer = (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    y_true_f = keras.backend.flatten(gt)
+    y_pred_f = keras.backend.flatten(pr)
+    intersection = keras.backend.sum(y_true_f * y_pred_f)
+    answer = (2. * intersection + smooth) / (keras.backend.sum(y_true_f) + keras.backend.sum(y_pred_f) + smooth)
     return -answer
 
 
