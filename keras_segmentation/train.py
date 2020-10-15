@@ -3,8 +3,8 @@ from .data_utils.data_loader import image_segmentation_generator, \
     verify_segmentation_dataset
 import glob
 import six
-import tensorflow
 from keras.callbacks import Callback
+
 
 def find_latest_checkpoint(checkpoints_path, fail_safe=True):
 
@@ -88,23 +88,21 @@ def train(model,
     input_width = model.input_width
     output_height = model.output_height
     output_width = model.output_width
-    
+
     if validate:
         assert val_images is not None
-        assert val_annotations is not None         
-        
-    
+        assert val_annotations is not None
+
     if optimizer_name is not None:
 
         if ignore_zero_class:
             loss_k = masked_categorical_crossentropy
-            
         else:
             loss_k = 'categorical_crossentropy'
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=['categorical_accuracy'])
+                      metrics=['accuracy'])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
@@ -156,10 +154,10 @@ def train(model,
     ]
 
     if not validate:
-        model.fit(train_gen, steps_per_epoch,
+        model.fit_generator(train_gen, steps_per_epoch,
                             epochs=epochs, callbacks=callbacks)
     else:
-        model.fit(train_gen,
+        model.fit_generator(train_gen,
                             steps_per_epoch,
                             validation_data=val_gen,
                             validation_steps=val_steps_per_epoch,
