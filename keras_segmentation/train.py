@@ -25,7 +25,7 @@ def dice_loss(gt, pr, smooth=1e-6):
     """
     y_true_f = backend.flatten(gt)
     y_pred_f = backend.flatten(pr)
-    intersection = .backend.sum(y_true_f * y_pred_f)
+    intersection = backend.sum(y_true_f * y_pred_f)
     answer = (2. * intersection + smooth) / (backend.sum(y_true_f) + backend.sum(y_pred_f) + smooth)
     return -answer
 
