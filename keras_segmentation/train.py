@@ -125,7 +125,7 @@ def train(model,
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=['categeorical_accuracy'])
+                      metrics=['categorical_accuracy'])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
