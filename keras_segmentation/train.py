@@ -4,7 +4,7 @@ from .data_utils.data_loader import image_segmentation_generator, \
 import glob
 import six
 from keras.callbacks import Callback
-from keras import backend as K
+from keras import backend
 
 def dice_loss(gt, pr, smooth=1e-6):
     """ Loss function base on dice coefficient.
