@@ -119,7 +119,7 @@ def train(model,
           n_classes=None,
           verify_dataset=True,
           checkpoints_path=None,
-          loss_k='categorical_crossentropy'
+          loss_k='categorical_crossentropy',
           epochs=5,
           batch_size=2,
           validate=False,
