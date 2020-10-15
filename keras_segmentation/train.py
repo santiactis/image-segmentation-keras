@@ -6,69 +6,6 @@ import six
 import tensorflow
 from keras.callbacks import Callback
 
-def generalised_dice_loss(prediction,
-                          ground_truth,
-                          weight_map=None,
-                          type_weight='Square'):
-    """
-    Function to calculate the Generalised Dice Loss defined in
-        Sudre, C. et. al. (2017) Generalised Dice overlap as a deep learning
-        loss function for highly unbalanced segmentations. DLMIA 2017
-    :param prediction: the logits
-    :param ground_truth: the segmentation ground truth
-    :param weight_map:
-    :param type_weight: type of weighting allowed between labels (choice
-        between Square (square of inverse of volume),
-        Simple (inverse of volume) and Uniform (no weighting))
-    :return: the loss
-    """
-    prediction = tensorflow.cast(prediction, tensorflow.float32)
-    if len(ground_truth.shape) == len(prediction.shape):
-        ground_truth = ground_truth[..., -1]
-    one_hot = labels_to_one_hot(ground_truth, tensorflow.shape(prediction)[-1])
-
-    if weight_map is not None:
-        num_classes = prediction.shape[1].value
-        # weight_map_nclasses = tf.reshape(
-        #     tf.tile(weight_map, [num_classes]), prediction.get_shape())
-        weight_map_nclasses = tensorflow.tile(
-            tensorflow.expand_dims(tensorflow.reshape(weight_map, [-1]), 1), [1, num_classes])
-        ref_vol = tensorflow.sparse_reduce_sum(
-            weight_map_nclasses * one_hot, reduction_axes=[0])
-
-        intersect = tensorflow.sparse_reduce_sum(
-            weight_map_nclasses * one_hot * prediction, reduction_axes=[0])
-        seg_vol = tensorflow.reduce_sum(
-            tensorflow.multiply(weight_map_nclasses, prediction), 0)
-    else:
-        ref_vol = tensorflow.sparse_reduce_sum(one_hot, reduction_axes=[0])
-        intersect = tensorflow.sparse_reduce_sum(one_hot * prediction,
-                                         reduction_axes=[0])
-        seg_vol = tensorflow.reduce_sum(prediction, 0)
-    if type_weight == 'Square':
-        weights = tensorflow.reciprocal(tensorflow.square(ref_vol))
-    elif type_weight == 'Simple':
-        weights = tensorflow.reciprocal(ref_vol)
-    elif type_weight == 'Uniform':
-        weights = tensorflow.ones_like(ref_vol)
-    else:
-        raise ValueError("The variable type_weight \"{}\""
-                         "is not defined.".format(type_weight))
-    new_weights = tensorflow.where(tensorflow.is_inf(weights), tensorflow.zeros_like(weights), weights)
-    weights = tensorflow.where(tensorflow.is_inf(weights), tensorflow.ones_like(weights) *
-                       tensorflow.reduce_max(new_weights), weights)
-    generalised_dice_numerator = \
-        2 * tensorflow.reduce_sum(tensorflow.multiply(weights, intersect))
-    # generalised_dice_denominator = \
-    #     tf.reduce_sum(tf.multiply(weights, seg_vol + ref_vol)) + 1e-6
-    generalised_dice_denominator = tensorflow.reduce_sum(
-        tensorflow.multiply(weights, tensorflow.maximum(seg_vol + ref_vol, 1)))
-    generalised_dice_score = \
-        generalised_dice_numerator / generalised_dice_denominator
-    generalised_dice_score = tensorflow.where(tensorflow.is_nan(generalised_dice_score), 1.0,
-                                      generalised_dice_score)
-    return 1 - generalised_dice_score
-
 def find_latest_checkpoint(checkpoints_path, fail_safe=True):
 
     def get_epoch_number_from_path(path):
@@ -163,11 +100,11 @@ def train(model,
             loss_k = masked_categorical_crossentropy
             
         else:
-            loss_k = generalised_dice_loss(train_images, train_annotations)
+            loss_k = 'categorical_crossentropy'
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
-                      metrics=['accuracy'])
+                      metrics=['categorical_accuracy'])
 
     if checkpoints_path is not None:
         with open(checkpoints_path+"_config.json", "w") as f:
