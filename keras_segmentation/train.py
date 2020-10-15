@@ -5,7 +5,7 @@ import glob
 import six
 from keras.callbacks import Callback
 
-def dice_loss(y_true, y_pred, smooth=1e-6):
+def dice_loss(gt, pr, smooth=1e-6):
     """ Loss function base on dice coefficient.
 
     Parameters
@@ -22,8 +22,8 @@ def dice_loss(y_true, y_pred, smooth=1e-6):
     keras tensor
         tensor containing dice loss.
     """
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
+    y_true_f = K.flatten(gt)
+    y_pred_f = K.flatten(pr)
     intersection = K.sum(y_true_f * y_pred_f)
     answer = (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
     return -answer
@@ -121,7 +121,7 @@ def train(model,
         if ignore_zero_class:
             loss_k = masked_categorical_crossentropy
         else:
-            loss_k = dice_loss(gt,pr)
+            loss_k = dice_loss
 
         model.compile(loss=loss_k,
                       optimizer=optimizer_name,
