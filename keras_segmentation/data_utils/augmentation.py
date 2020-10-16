@@ -203,8 +203,7 @@ def _load_augmentation_aug_all_seismic():
         iaa.OneOf([
             iaa.GaussianBlur((0, 3.0)), 
             iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.2)
-        ],
-            random_order=True)
+        ])
     ],
         random_order=True
     )
