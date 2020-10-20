@@ -187,23 +187,23 @@ def _load_augmentation_aug_all_seismic():
         return iaa.Sometimes(0.5, aug)
 
     return iaa.Sequential([
-        iaa.Fliplr(0.5),
+        iaa.Fliplr(0.7),
         sometimes(iaa.CropAndPad(
-            percent=(-0.05, 0.1), 
+            percent=(-0.2, 0.1), 
             pad_mode='constant', 
             pad_cval=(0, 255))),
         sometimes(iaa.Affine(
-            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+            scale={"x": (0.5, 0.8), "y": (0.2, 0.5)},
             translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
-            rotate=(-45, 45),
-            shear=(-16, 16),
+            rotate=(-30, 30),
+            shear=(-7, 7),
             order=[0, 1],
             cval=(0, 255),
             mode='constant')),
-        iaa.OneOf([
+        sometimes(iaa.OneOf([
             iaa.GaussianBlur((0, 3.0)), 
             iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.2)
-        ])
+        ]))
     ],
         random_order=True
     )
