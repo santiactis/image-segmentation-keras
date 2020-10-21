@@ -72,15 +72,16 @@ class CheckpointsCallback(Callback):
             print("saved ", self.checkpoints_path + "." + str(epoch))
 
 class EarlyStoppingByLossVal(Callback):
-    def __init__(self, monitor='val_loss', value=0.00001, verbose=0):
+    def __init__(self, monitor='val_loss', value=0.00001, verbose=0, checkpoints_path):
         super(Callback, self).__init__()
         self.monitor = monitor
         self.value = value
         self.verbose = verbose
+        self.checkpoints_path = checkpoints_path
 
     def on_epoch_end(self, epoch, logs={}):
         current = logs.get(self.monitor)
-        if current<logs['val_loss'][-1]:
+        if current<min(logs['val_loss']):
             if self.checkpoints_path is not None:
                 self.model.save_weights(self.checkpoints_path + "." + str(epoch)+'_'+str(current))
                 print("saved ", self.checkpoints_path + "." + str(epoch)+'_'+str(current), ' with val_loss= '+str(current))
@@ -104,6 +105,7 @@ def train(model,
           epochs=5,
           batch_size=2,
           validate=False,
+          val_callback=None,
           val_images=None,
           val_annotations=None,
           val_batch_size=2,
@@ -194,10 +196,10 @@ def train(model,
         val_gen = image_segmentation_generator(
             val_images, val_annotations,  val_batch_size,
             n_classes, input_height, input_width, output_height, output_width)
-        if val_callback = check:
+        if val_callback == 'check':
             callbacks = [CheckpointsCallback(checkpoints_path)]
         else:
-            callbacks = EarlyStoppingByLossVal()
+            callbacks = [EarlyStoppingByLossVal(checkpoints_path)]
 
     if not validate:
         model.fit_generator(train_gen, steps_per_epoch,
