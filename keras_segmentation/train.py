@@ -72,7 +72,7 @@ class CheckpointsCallback(Callback):
             print("saved ", self.checkpoints_path + "." + str(epoch))
 
 class EarlyStoppingByLossVal(Callback):
-    def __init__(self, monitor='val_loss', value=0.00001, verbose=0, checkpoints_path):
+    def __init__(self, checkpoints_path, monitor='val_loss', value=0.00001, verbose=0):
         super(Callback, self).__init__()
         self.monitor = monitor
         self.value = value
