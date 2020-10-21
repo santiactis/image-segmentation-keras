@@ -46,6 +46,26 @@ class CheckpointsCallback(Callback):
         if self.checkpoints_path is not None:
             self.model.save_weights(self.checkpoints_path + "." + str(epoch))
             print("saved ", self.checkpoints_path + "." + str(epoch))
+ 
+class EarlyStoppingByLossVal(Callback):
+    def __init__(self, monitor='val_loss', value=0.00001, verbose=0):
+        super(Callback, self).__init__()
+        self.monitor = monitor
+        self.value = value
+        self.verbose = verbose
+
+    def on_epoch_end(self, epoch, logs={}):
+        current = logs.get(self.monitor)
+        if self.checkpoints_path is not None:
+            self.model.save_weights(self.checkpoints_path + "." + str(epoch))
+            print("saved ", self.checkpoints_path + "." + str(epoch), 'with '+str(current)' val_loss)
+        if current is None:
+            warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
+
+        if current < self.value:
+            if self.verbose > 0:
+                print("Epoch %05d: early stopping THR" % epoch)
+            self.model.stop_training = True
 
 
 def train(model,
@@ -62,6 +82,7 @@ def train(model,
           val_images=None,
           val_annotations=None,
           val_batch_size=2,
+          set_callback_val=False,
           auto_resume_checkpoint=False,
           load_weights=None,
           steps_per_epoch=512,
@@ -149,9 +170,10 @@ def train(model,
             val_images, val_annotations,  val_batch_size,
             n_classes, input_height, input_width, output_height, output_width)
 
-    callbacks = [
-        CheckpointsCallback(checkpoints_path)
-    ]
+        if not set_callback_val:
+            callbacks = [CheckpointsCallback(checkpoints_path)]
+        if set_callback_val:
+            callbacks = [EarlyStoppingByLossVal()]
 
     if not validate:
         model.fit_generator(train_gen, steps_per_epoch,
