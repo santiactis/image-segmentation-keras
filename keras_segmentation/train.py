@@ -4,6 +4,7 @@ from .data_utils.data_loader import image_segmentation_generator, \
 import glob
 import six
 from keras.callbacks import Callback
+from keras.callbacks import History 
 from keras import backend
 
 def dice_loss(gt, pr, smooth=1e-6):
@@ -80,11 +81,9 @@ class EarlyStoppingByLossVal(Callback):
         self.checkpoints_path = checkpoints_path
 
     def on_epoch_end(self, epoch, logs={}):
-        current = logs.get(self.monitor)
-        if current<min(logs['val_loss']):
-            if self.checkpoints_path is not None:
-                self.model.save_weights(self.checkpoints_path + "." + str(epoch)+'_'+str(current))
-                print("saved ", self.checkpoints_path + "." + str(epoch)+'_'+str(current), ' with val_loss= '+str(current))
+        if self.checkpoints_path is not None:
+            self.model.save_weights(self.checkpoints_path + "." + str(epoch)+'_'+str(current))
+            print("saved ", self.checkpoints_path + "." + str(epoch)+'_'+str(current), ' with val_loss= '+str(current))
         if current is None:
             warnings.warn("Early stopping requires %s available!" % self.monitor, RuntimeWarning)
 
