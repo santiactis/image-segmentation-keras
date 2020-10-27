@@ -76,7 +76,7 @@ def find_best_checkpoint(checkpoints_path, fail_safe=True):
             return None
 
     # Find the checkpoint file with the maximum epoch
-    latest_epoch_checkpoint = min(all_checkpoint_files,
+   best_epoch_checkpoint = min(all_checkpoint_files,
                                   key=lambda f:
                                   float(get_epoch_number_from_path(f)))
     return best_epoch_checkpoint
@@ -106,6 +106,7 @@ class EarlyStoppingByLossVal(Callback):
         self.checkpoints_path = checkpoints_path
 
     def on_epoch_end(self, epoch, logs={}):
+        curret = self.monitor
         if self.checkpoints_path is not None:
             self.model.save_weights(self.checkpoints_path + "."+str(current))
             print("saved ", self.checkpoints_path + "."+str(current), ' with val_loss= '+str(current))
