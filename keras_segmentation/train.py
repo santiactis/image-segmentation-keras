@@ -76,9 +76,7 @@ def find_best_checkpoint(checkpoints_path, fail_safe=True):
             return None
 
     # Find the checkpoint file with the maximum epoch
-   best_epoch_checkpoint = min(all_checkpoint_files,
-                                  key=lambda f:
-                                  float(get_epoch_number_from_path(f)))
+    best_epoch_checkpoint = min(all_checkpoint_files,key=lambda f:float(get_epoch_number_from_path(f)))
     return best_epoch_checkpoint
 
 
